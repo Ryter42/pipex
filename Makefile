@@ -6,13 +6,13 @@
 #    By: elias <elias@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/29 19:25:41 by emoreau           #+#    #+#              #
-#    Updated: 2023/06/30 23:26:36 by elias            ###   ########.fr        #
+#    Updated: 2023/07/02 17:40:02 by elias            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRC_DIR		= ./srcs/
-OBJ_DIR	= ./obj/
-SRCS	=	pipex.c\
+SRC_DIR		=	./srcs/
+OBJ_DIR		=	./obj/
+SRCS		=	pipex.c\
 
 
 OBJS = $(patsubst %.c,$(OBJ_DIR)%.o,$(SRCS))

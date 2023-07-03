@@ -6,7 +6,7 @@
 /*   By: elias <elias@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 17:30:36 by elias             #+#    #+#             */
-/*   Updated: 2023/07/02 17:09:53 by elias            ###   ########.fr       */
+/*   Updated: 2023/07/03 16:25:50 by elias            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,11 @@ typedef struct s_data
 	char	**av;
 	char	**env;
 	char	**path;
-	int		fd[2];
+	int		**fd;
 	pid_t	pid;
+	int		index;
+	int		file;
+	char	*cmd;
 }	t_data;
 
 #endif

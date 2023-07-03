@@ -6,7 +6,7 @@
 /*   By: elias <elias@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 23:51:39 by elias             #+#    #+#             */
-/*   Updated: 2023/07/02 17:42:44 by elias            ###   ########.fr       */
+/*   Updated: 2023/07/03 18:45:33 by elias            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,15 +75,35 @@ char	**addslash(char **env)
 	return (path);
 }
 
+int	**create_tab_fd(int size)
+{
+	int	**fd;
+	int	i;
+
+	i = 0;
+	fd = malloc(sizeof(int **) * (size + 1));
+	if (!fd)
+		return (NULL);
+	while (i < size)
+	{
+		fd[i] = malloc(sizeof(int *) * 2);
+		i++;
+	}
+	fd[i] = NULL;
+	return (fd);
+}
+
 t_data	*init(int ac, char **av, char **env)
 {
 	t_data	*data;
 
 	data = malloc(sizeof(t_data));
+	data->fd = create_tab_fd(ac - 3);
 	data->path = addslash(env);
 	data->av = av;
 	data->env = env;
 	data->ac = ac;
+	data->index = 2;
 	return (data);
 }
 
@@ -103,25 +123,84 @@ int	findpath(char **path, char *cmd)
 	return (-1);
 }
 
+void	firstcmd(t_data *data)
+{
+	int fd;
+
+	fd = open(data->av[1], O_RDONLY);
+	data->file = findpath(data->path, data->av[1]);
+	data->cmd = ft_strjoin(data->path[data->file], data->av[1]);
+	close(data->fd[data->index - 2][0]);
+	dup2(fd, STDIN_FILENO);
+	dup2(data->fd[data->index - 2][1], STDOUT_FILENO);
+	execve(data->cmd, &data->av[2], data->env);	
+}
+
+void	midlecmd(t_data *data)
+{
+	data->file = findpath(data->path, data->av[1]);
+	data->cmd = ft_strjoin(data->path[data->file], data->av[1]);
+	close(data->fd[data->index - 2][0]);
+	dup2(data->fd[data->index - 1][0], STDIN_FILENO);
+	dup2(data->fd[data->index - 2][1], STDOUT_FILENO);
+	execve(data->cmd, &data->av[data->index + 2], data->env);
+}
+
+void	lastcmd(t_data *data)
+{
+	int fd;
+
+	fd = open(data->av[data->ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	data->file = findpath(data->path, data->av[1]);
+	data->cmd = ft_strjoin(data->path[data->file], data->av[1]);
+	close(data->fd[data->index - 2][0]);
+	dup2(data->fd[data->index - 1][0], STDIN_FILENO);
+	dup2(fd, STDOUT_FILENO);
+	execve(data->cmd, &data->av[data->index + 2], data->env);	
+}
+
+void	exec(t_data *data)
+{
+	printf("%d\n", data->index);
+	if (data->index == 2)
+	{
+		printf("firstcmd");
+		firstcmd(data);
+	}
+	else if (data->index != data->ac - 3)
+	{
+		printf("midlecmd");
+		midlecmd(data);
+	}
+	else
+	{
+		printf("lastcmd");
+		lastcmd(data);
+	}
+}
+
+
 int	loopfork(t_data *data)
 {
-	int	file;
-	// int	i;
+	while (data->index <= data->ac - 2)
+	{
+		if (pipe(data->fd[data->index - 2]) < 0)
+			return (0);
+		data->pid = fork();
+		if (data->pid < 0)
+			return (0);
+		if (data->pid == 0)
+		{
+			printf("fork ok\n");
+			exec(data);
+		}
+		else
+		{
+			close(data->fd[data->index - 2][0]);
+			data->index++;
+		}
 
-	// i = 0;
-	file = findpath(data->path, data->av[1]);
-	printf("%s\n", data->path[file]);
-	// if (pipe(data->fd) < 0)
-	// 	return (0);
-	// while (i < ac - 1)
-	// {
-
-	// 	data->pid = fork();
-	// 	if (data->pid == 0)
-	// 	{
-	// 		execve()
-	// 	}
-	// }
+	}
 	return (0);
 }
 
@@ -140,6 +219,6 @@ int	main(int ac, char **av, char **env)
 	// 	i++;
 	// }
 
-	//test1
+	//test1n
 
 }

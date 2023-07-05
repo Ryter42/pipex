@@ -6,7 +6,7 @@
 /*   By: elias <elias@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 23:51:39 by elias             #+#    #+#             */
-/*   Updated: 2023/07/03 18:45:33 by elias            ###   ########.fr       */
+/*   Updated: 2023/07/04 22:18:55 by elias            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,22 +128,23 @@ void	firstcmd(t_data *data)
 	int fd;
 
 	fd = open(data->av[1], O_RDONLY);
-	data->file = findpath(data->path, data->av[1]);
-	data->cmd = ft_strjoin(data->path[data->file], data->av[1]);
+	data->file = findpath(data->path, data->av[data->index]);
+	data->cmd = ft_strjoin(data->path[data->file], data->av[2]);
 	close(data->fd[data->index - 2][0]);
 	dup2(fd, STDIN_FILENO);
 	dup2(data->fd[data->index - 2][1], STDOUT_FILENO);
+	// dprintf(2, "data->cmd = %s\n", data->cmd);
 	execve(data->cmd, &data->av[2], data->env);	
 }
 
 void	midlecmd(t_data *data)
 {
-	data->file = findpath(data->path, data->av[1]);
-	data->cmd = ft_strjoin(data->path[data->file], data->av[1]);
+	data->file = findpath(data->path, data->av[data->index]);
+	data->cmd = ft_strjoin(data->path[data->file], data->av[data->index]);
 	close(data->fd[data->index - 2][0]);
 	dup2(data->fd[data->index - 1][0], STDIN_FILENO);
 	dup2(data->fd[data->index - 2][1], STDOUT_FILENO);
-	execve(data->cmd, &data->av[data->index + 2], data->env);
+	execve(data->cmd, &data->av[data->index], data->env);
 }
 
 void	lastcmd(t_data *data)
@@ -151,30 +152,32 @@ void	lastcmd(t_data *data)
 	int fd;
 
 	fd = open(data->av[data->ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	data->file = findpath(data->path, data->av[1]);
-	data->cmd = ft_strjoin(data->path[data->file], data->av[1]);
+	data->file = findpath(data->path, data->av[data->index]);
+	data->cmd = ft_strjoin(data->path[data->file], data->av[data->index]);
 	close(data->fd[data->index - 2][0]);
 	dup2(data->fd[data->index - 1][0], STDIN_FILENO);
 	dup2(fd, STDOUT_FILENO);
-	execve(data->cmd, &data->av[data->index + 2], data->env);	
+	// dprintf(2, "data->cmd = %s\n", data->cmd);
+	execve(data->cmd, &data->av[data->index], data->env);	
 }
 
 void	exec(t_data *data)
 {
-	printf("%d\n", data->index);
+	// printf("index = %d\n", data->index);
+	// printf("--%d\n", data->ac - 3);
 	if (data->index == 2)
 	{
-		printf("firstcmd");
+		// printf("firstcmd\n");
 		firstcmd(data);
 	}
-	else if (data->index != data->ac - 3)
+	else if (data->index < data->ac - 3)
 	{
-		printf("midlecmd");
+		printf("midlecmd\n");
 		midlecmd(data);
 	}
 	else
 	{
-		printf("lastcmd");
+		// printf("lastcmd\n");
 		lastcmd(data);
 	}
 }
@@ -191,12 +194,12 @@ int	loopfork(t_data *data)
 			return (0);
 		if (data->pid == 0)
 		{
-			printf("fork ok\n");
+			// printf("fork ok\n");
 			exec(data);
 		}
 		else
 		{
-			close(data->fd[data->index - 2][0]);
+			close(data->fd[data->index - 2][1]);
 			data->index++;
 		}
 

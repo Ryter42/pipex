@@ -6,7 +6,7 @@
 /*   By: elias <elias@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 23:51:39 by elias             #+#    #+#             */
-/*   Updated: 2023/07/06 18:34:08 by elias            ###   ########.fr       */
+/*   Updated: 2023/07/06 18:36:58 by elias            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,7 +239,6 @@ int	loopfork(t_data *data)
 			waitpid(data->pid, &status, 0);
 			data->index++;
 		}
-
 	}
 	return (0);
 }

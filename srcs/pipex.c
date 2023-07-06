@@ -6,7 +6,7 @@
 /*   By: elias <elias@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 23:51:39 by elias             #+#    #+#             */
-/*   Updated: 2023/07/05 19:56:14 by elias            ###   ########.fr       */
+/*   Updated: 2023/07/06 18:34:08 by elias            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,35 +132,40 @@ void	get_cmd(t_data *data)
 
 void	firstcmd(t_data *data)
 {
-	int fd;
+	// int fd;
 
 	data->file = findpath(data->path, data->av[data->index]);
 	data->cmd = ft_strjoin(data->path[data->file], data->av[data->index]);
 	data->arg = ft_split(data->av[data->index], ' ');
-	fd = open(data->av[1], O_RDONLY);
+	// fd = open(data->av[1], O_RDONLY);
 	close(data->fd[data->index - 2][0]);
-	dup2(fd, STDIN_FILENO);
+	// close(data->fd[0]);
+	// dup2(data->fd[1], STDOUT_FILENO);
+	// close(data->fd[1]);
+	// dup2(fd, STDIN_FILENO);
 	dup2(data->fd[data->index - 2][1], STDOUT_FILENO);
-	dprintf(2, "arg = %s\n", data->arg[0]);
-	dprintf(2, "arg = %s\n", data->arg[1]);
-	dprintf(2, "data->cmd = %s\n", data->cmd);
+	close(data->fd[data->index - 2][1]);
+	// dprintf(2, "arg = %s\n", data->arg[0]);
+	// dprintf(2, "arg = %s\n", data->arg[1]);
+	// dprintf(2, "data->cmd = %s\n", data->cmd);
+	write(2, data->arg[0], ft_strlen(data->arg[0]));
 	execve(data->cmd, data->arg, data->env);	
 }
 
-void	midlecmd(t_data *data)
-{
-	data->file = findpath(data->path, data->av[data->index]);
-	data->cmd = ft_strjoin(data->path[data->file], data->av[data->index]);
-	data->arg = ft_split(data->av[data->index], ' ');
-	close(data->fd[data->index - 3][1]);
-	close(data->fd[data->index - 2][0]);
-	dup2(data->fd[data->index - 1][0], STDIN_FILENO);
-	dup2(data->fd[data->index - 2][1], STDOUT_FILENO);
-	dprintf(2, "%s\n", data->arg[0]);
-	dprintf(2, "%s\n", data->arg[1]);
-	dprintf(2, "data->cmd = %s\n", data->cmd);
-	execve(data->cmd, data->arg, data->env);
-}
+// void	midlecmd(t_data *data)
+// {
+// 	data->file = findpath(data->path, data->av[data->index]);
+// 	data->cmd = ft_strjoin(data->path[data->file], data->av[data->index]);
+// 	data->arg = ft_split(data->av[data->index], ' ');
+// 	close(data->fd[data->index - 3][1]);
+// 	close(data->fd[data->index - 2][0]);
+// 	dup2(data->fd[data->index - 1][0], STDIN_FILENO);
+// 	dup2(data->fd[data->index - 2][1], STDOUT_FILENO);
+// 	dprintf(2, "%s\n", data->arg[0]);
+// 	dprintf(2, "%s\n", data->arg[1]);
+// 	dprintf(2, "data->cmd = %s\n", data->cmd);
+// 	execve(data->cmd, data->arg, data->env);
+// }
 
 void	lastcmd(t_data *data)
 {
@@ -171,35 +176,35 @@ void	lastcmd(t_data *data)
 	data->arg = ft_split(data->av[data->index], ' ');
 	fd = open(data->av[data->ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	close(data->fd[data->index - 3][1]);
-	close(data->fd[data->index - 2][0]);
-	dup2(data->fd[data->index - 1][0], STDIN_FILENO);
+	dup2(data->fd[data->index - 3][0], STDIN_FILENO);
+	close(data->fd[data->index - 3][0]);
 	dup2(fd, STDOUT_FILENO);
-	dprintf(2, "test");
-	dprintf(2, "arg = %s\n", data->arg[0]);
-	dprintf(2, "arg = %s\n", data->arg[1]);
-	dprintf(2, "data->cmd = %s\n", data->cmd);
+	// dprintf(2, "test");
+	// dprintf(2, "arg = %s\n", data->arg[0]);
+	// dprintf(2, "arg = %s\n", data->arg[1]);
+	// dprintf(2, "data->cmd = %s\n", data->cmd);
+	write(2, data->arg[0], ft_strlen(data->arg[0]));
 	execve(data->cmd, data->arg, data->env);	
 }
 
 void	exec(t_data *data)
 {
 	get_cmd(data);
-	printf("index = %d\n", data->index);
-	// printf("commande numero %d\n", data->ac - 3);
+	// printf("index = %d\n", data->index);
 	// printf("nombre commande %d\n", data->ac - 3);
 	if (data->index == 2)
 	{
-		printf("firstcmd\n");
+		// printf("firstcmd\n");
 		firstcmd(data);
 	}
-	else if (data->index <= data->ac - 3)
-	{
-		printf("midlecmd\n");
-		midlecmd(data);
-	}
+	// else if (data->index <= data->ac - 3)
+	// {
+	// 	printf("midlecmd\n");
+	// 	midlecmd(data);
+	// }
 	else
 	{
-		printf("lastcmd\n");
+		// printf("lastcmd\n");
 		lastcmd(data);
 	}
 }
@@ -212,6 +217,7 @@ int	loopfork(t_data *data)
 	while (data->index <= data->ac - 2)
 	{
 		if (pipe(data->fd[data->index - 2]) < 0)
+		// if (pipe(data->fd) < 0)
 			return (0);
 		data->pid = fork();
 		if (data->pid < 0)
@@ -223,9 +229,13 @@ int	loopfork(t_data *data)
 		}
 		else
 		{
+			// close(data->fd[1]);
+			// dup2(data->fd[0], STDIN_FILENO);
+			// close(data->fd[0]);
 			close(data->fd[data->index - 2][1]);
-			if (data->index != 2)
-				close(data->fd[data->index - 3][0]);
+			dup2(data->fd[data->index - 2][0], STDIN_FILENO);
+			// if (data->index != 2)
+			close(data->fd[data->index - 2][0]);
 			waitpid(data->pid, &status, 0);
 			data->index++;
 		}

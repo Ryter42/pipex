@@ -6,7 +6,7 @@
 /*   By: elias <elias@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 17:30:36 by elias             #+#    #+#             */
-/*   Updated: 2023/07/03 16:25:50 by elias            ###   ########.fr       */
+/*   Updated: 2023/07/05 15:38:02 by elias            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ typedef struct s_data
 	int		index;
 	int		file;
 	char	*cmd;
+	char 	**arg;
 }	t_data;
 
 #endif

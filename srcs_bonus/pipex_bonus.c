@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
+/*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emoreau <emoreau@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 23:51:39 by elias             #+#    #+#             */
-/*   Updated: 2023/09/25 13:47:52 by emoreau          ###   ########.fr       */
+/*   Updated: 2023/09/25 13:47:59 by emoreau          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,12 @@ t_data	*init(int ac, char **av, char **env)
 	data->av = av;
 	data->env = env;
 	data->ac = ac;
-	data->heredoc = 0;
+	data->heredoc = is_heredoc(av[1]);
+	if (data->heredoc == 1)
+	{
+		data->limiteur = av[2];
+		heredoc(data, ft_open_heredoc(data));
+	}
 	data->index = 2 + data->heredoc;
 	return (data);
 }
@@ -66,10 +71,11 @@ int	main(int ac, char **av, char **env)
 {
 	t_data	*data;
 
-	if (ac != 5)
+	if (ac < 5)
 		return (ft_printf("Error arg\n"), 1);
 	data = init(ac, av, env);
 	loopfork(data);
 	ft_free(data);
+	unlink(".heredoc_tmp");
 	return (0);
 }
